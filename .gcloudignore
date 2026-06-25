@@ -1,0 +1,12 @@
+.git/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+live_test_output.txt
+.env
+
+# Keep these despite .gitignore
+!data/papers/**
+!vector_store/**
