@@ -19,6 +19,9 @@ from research_agent.tools.custom_tools import (
 MODEL = GEMINI_MODEL
 _AGENT_KWARGS = {"model": MODEL, "generate_content_config": GENERATE_CONTENT_CONFIG}
 
+# Shared research tools — both agents get both tools to prevent cross-agent tool-call errors.
+_RESEARCH_TOOLS = [search_knowledge_base, search_web]
+
 # --- Researcher Agents (used in Parallel Execution) ---
 
 rag_researcher = Agent(
@@ -35,12 +38,13 @@ RESEARCH PLAN:
 QUERY:
 {user_query?}
 
-Use the search_knowledge_base tool to find relevant paper excerpts.
+IMPORTANT: Call ONLY the `search_knowledge_base` tool. Do NOT call `search_web`.
+Use search_knowledge_base to find relevant paper excerpts.
 Summarize findings with proper academic tone. Include source document names.
 Save your findings concisely — they will be merged with web research results.
 """,
     output_key="rag_findings",
-    tools=[search_knowledge_base],
+    tools=_RESEARCH_TOOLS,
 )
 
 web_researcher = Agent(
@@ -56,12 +60,13 @@ RESEARCH PLAN:
 QUERY:
 {user_query?}
 
-Use the search_web tool to find the latest citations, recent papers, and current developments.
+IMPORTANT: Call ONLY the `search_web` tool. Do NOT call `search_knowledge_base`.
+Use search_web to find the latest citations, recent papers, and current developments.
 Prioritize authoritative sources (.edu, arxiv, pubmed, major journals).
 Save concise findings with URLs for citation.
 """,
     output_key="web_findings",
-    tools=[search_web],
+    tools=_RESEARCH_TOOLS,
 )
 
 # --- Reviewer / QA Agent (Feedback Loop) ---
